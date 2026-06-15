@@ -1,0 +1,101 @@
+<div class="mx-auto max-w-7xl space-y-6">
+  <!-- Header -->
+  <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between animate-fade-up">
+    <div>
+      <h1 class="text-2xl font-bold capitalize tracking-tight text-ink">Welcome back, {{ greeting() }} 👋</h1>
+      <p class="mt-1 text-sm text-muted">Here's what's happening across your dealer network.</p>
+    </div>
+    <a routerLink="/dealers" class="btn-brand self-start">
+      <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+      Manage Dealers
+    </a>
+  </div>
+
+  <!-- Stat cards -->
+  <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    @for (stat of stats(); track stat.label; let i = $index) {
+      <div class="card p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift animate-fade-up"
+        [style.animation-delay.ms]="i * 70">
+        <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500/12 text-brand-500">
+          @switch (stat.icon) {
+            @case ('store') { <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1-5h16l1 5" /><path d="M4 9v11h16V9" /><path d="M3 9h18" /></svg> }
+            @case ('check') { <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14" /><path d="M22 4 12 14.01l-3-3" /></svg> }
+            @case ('pause') { <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M10 9v6M14 9v6" /></svg> }
+            @case ('star') { <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg> }
+          }
+        </div>
+        <div class="mt-4">
+          @if (loading()) {
+            <div class="skeleton h-8 w-20"></div>
+          } @else {
+            <p class="text-3xl font-bold tracking-tight text-ink">{{ counts()[i] | number }}</p>
+          }
+          <p class="mt-1 text-sm text-muted">{{ stat.label }}</p>
+        </div>
+      </div>
+    }
+  </div>
+
+  <!-- Lower grid -->
+  <div class="grid grid-cols-1 gap-4 lg:grid-cols-3">
+    <!-- Recent activity -->
+    <div class="card p-5 lg:col-span-2 animate-fade-up" style="animation-delay: 120ms">
+      <h2 class="font-semibold text-ink">{{ recentTitle() }}</h2>
+      <div class="mt-4 space-y-1">
+        @if (loading()) {
+          @for (row of [1,2,3,4]; track row) {
+            <div class="flex items-center gap-3 py-2.5">
+              <div class="skeleton h-9 w-9 rounded-full"></div>
+              <div class="flex-1 space-y-2"><div class="skeleton h-3.5 w-1/3"></div><div class="skeleton h-3 w-1/2"></div></div>
+            </div>
+          }
+        } @else if (recent().length === 0) {
+          <p class="py-8 text-center text-sm text-muted">No activity to show yet.</p>
+        } @else {
+          @for (item of recent(); track $index) {
+            <div class="flex items-center gap-3 rounded-xl px-2 py-2.5 transition hover:bg-surface-2">
+              <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
+                [ngClass]="{
+                  'bg-brand-500/12 text-brand-500': item.tone === 'brand',
+                  'bg-emerald-500/12 text-emerald-500': item.tone === 'green',
+                  'bg-amber-500/12 text-amber-500': item.tone === 'amber',
+                  'bg-rose-500/12 text-rose-500': item.tone === 'rose'
+                }">
+                <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 8v4l3 2" /></svg>
+              </span>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-medium text-ink">{{ item.action }}</p>
+                <p class="truncate text-xs text-muted">{{ item.detail }}</p>
+              </div>
+              <span class="shrink-0 text-xs text-muted">{{ item.time }}</span>
+            </div>
+          }
+        }
+      </div>
+    </div>
+
+    <!-- Status breakdown -->
+    <div class="card p-5 animate-fade-up" style="animation-delay: 180ms">
+      <h2 class="font-semibold text-ink">Dealer status</h2>
+      <p class="mt-1 text-xs text-muted">Distribution across the network</p>
+      <div class="mt-5 flex h-3 overflow-hidden rounded-full bg-surface-2">
+        @for (seg of breakdown(); track seg.label) {
+          <div class="h-full transition-all duration-700" [ngClass]="seg.class"
+            [style.width.%]="loading() ? 0 : (seg.value / breakdownTotal) * 100"></div>
+        }
+      </div>
+      <ul class="mt-5 space-y-3">
+        @for (seg of breakdown(); track seg.label) {
+          <li class="flex items-center justify-between text-sm">
+            <span class="flex items-center gap-2 text-muted"><span class="h-2.5 w-2.5 rounded-full" [ngClass]="seg.class"></span>{{ seg.label }}</span>
+            <span class="font-semibold text-ink">{{ seg.value }}</span>
+          </li>
+        }
+      </ul>
+      <div class="mt-5 rounded-xl bg-surface-2 p-4">
+        <p class="text-xs text-muted">Network health</p>
+        <p class="mt-1 text-2xl font-bold text-gradient">Excellent</p>
+      </div>
+    </div>
+  </div>
+</div>

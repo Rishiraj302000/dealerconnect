@@ -1,0 +1,57 @@
+<div class="mx-auto max-w-7xl space-y-5">
+  <div class="animate-fade-up">
+    <h1 class="text-2xl font-bold tracking-tight text-ink">Favorites</h1>
+    <p class="mt-1 text-sm text-muted">Dealers you've saved for quick access.</p>
+  </div>
+
+  <!-- Filter chips -->
+  @if (!loading() && all().length > 0) {
+    <div class="flex flex-wrap items-center gap-2 animate-fade-up">
+      <button (click)="filter('')" class="rounded-full px-3.5 py-1.5 text-sm font-medium transition"
+        [class]="category() === '' ? 'bg-brand-500 text-white shadow-lift' : 'bg-surface border border-line text-muted hover:text-ink'">
+        All
+      </button>
+      @for (cat of categories(); track cat) {
+        <button (click)="filter(cat)" class="rounded-full px-3.5 py-1.5 text-sm font-medium transition"
+          [class]="category() === cat ? 'bg-brand-500 text-white shadow-lift' : 'bg-surface border border-line text-muted hover:text-ink'">
+          {{ cat }}
+        </button>
+      }
+    </div>
+  }
+
+  <!-- Grid -->
+  @if (loading()) {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      @for (r of [1,2,3,4,5,6]; track r) { <div class="skeleton h-32 w-full rounded-2xl"></div> }
+    </div>
+  } @else if (displayed().length === 0) {
+    <div class="card flex flex-col items-center justify-center py-20 text-center animate-fade-up">
+      <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-brand-500/12 text-brand-500">
+        <svg class="h-7 w-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+      </div>
+      <p class="mt-4 text-sm font-medium text-ink">No favorites here yet</p>
+      <p class="mt-1 max-w-xs text-sm text-muted">Add dealers to your favorites from the Dealers page.</p>
+    </div>
+  } @else {
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      @for (f of displayed(); track f.id) {
+        <div class="card cursor-pointer p-5 transition-all duration-300 hover:-translate-y-1 hover:shadow-lift animate-fade-up" (click)="open(f.dealerId)">
+          <div class="flex items-start justify-between">
+            <div class="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-600 text-base font-bold text-white">
+              {{ (f.dealerName || 'D').charAt(0) }}
+            </div>
+            <button class="icon-btn h-9 w-9 hover:text-rose-500" (click)="$event.stopPropagation(); remove(f)" aria-label="Remove favorite">
+              <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" /></svg>
+            </button>
+          </div>
+          <p class="mt-4 truncate font-semibold text-ink">{{ f.dealerName || 'Dealer #' + f.dealerId }}</p>
+          <p class="text-xs text-muted">{{ f.dealerCode || '—' }}</p>
+          @if (f.category) {
+            <span class="badge mt-3 bg-brand-500/12 text-brand-600 dark:text-brand-300">{{ f.category }}</span>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

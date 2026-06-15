@@ -1,0 +1,15 @@
+# Claude files
+.claude/
+
+# VS Code
+.vscode/
+
+# IntelliJ
+.idea/
+
+# Logs
+*.log
+*.err
+
+# Maven
+target/

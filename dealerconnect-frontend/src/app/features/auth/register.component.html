@@ -1,0 +1,113 @@
+<div class="relative flex min-h-screen bg-bg">
+  <div class="absolute right-5 top-5 z-20">
+    <app-theme-toggle></app-theme-toggle>
+  </div>
+
+  <!-- Brand showcase -->
+  <div class="relative hidden w-1/2 overflow-hidden lg:block">
+    <div class="absolute inset-0" style="background: linear-gradient(135deg, #7c3aed, #4f46e5 55%, #0ea5e9)"></div>
+    <div class="absolute -right-24 top-24 h-96 w-96 rounded-full bg-white/20 blur-3xl animate-aurora"></div>
+    <div class="absolute -left-10 bottom-0 h-[26rem] w-[26rem] rounded-full bg-sky-400/30 blur-3xl animate-aurora" style="animation-delay: -7s"></div>
+
+    <div class="relative z-10 flex h-full flex-col justify-between p-12 text-white">
+      <div class="flex items-center gap-2.5">
+        <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-white/15 backdrop-blur">
+          <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M3 7l9-4 9 4-9 4-9-4z" /><path d="M3 7v10l9 4 9-4V7" /><path d="M12 11v10" />
+          </svg>
+        </div>
+        <span class="text-lg font-bold tracking-tight">DealerConnect</span>
+      </div>
+      <div class="max-w-md animate-fade-up">
+        <h1 class="text-4xl font-extrabold leading-tight tracking-tight">Get started in seconds.</h1>
+        <p class="mt-4 text-base leading-relaxed text-white/80">
+          Create your account and start managing dealers, contacts, and favorites with
+          enterprise-grade security and full auditing.
+        </p>
+      </div>
+      <p class="text-xs text-white/60">© 2026 DealerConnect. All rights reserved.</p>
+    </div>
+  </div>
+
+  <!-- Form -->
+  <div class="flex w-full items-center justify-center px-6 py-12 lg:w-1/2">
+    <div class="w-full max-w-sm animate-fade-up">
+      <h2 class="text-2xl font-bold tracking-tight text-ink">Create your account</h2>
+      <p class="mt-1.5 text-sm text-muted">Join DealerConnect and take control.</p>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="mt-7 space-y-4" novalidate>
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-ink" for="name">Full name</label>
+          <input id="name" type="text" formControlName="name" autocomplete="name"
+            class="field" [class.border-rose-500]="invalid('name')" placeholder="Jane Doe" />
+          @if (invalid('name')) {
+            <p class="mt-1.5 text-xs font-medium text-rose-500 animate-fade-in">Name is required.</p>
+          }
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-ink" for="email">Email</label>
+          <input id="email" type="email" formControlName="email" autocomplete="email"
+            class="field" [class.border-rose-500]="invalid('email')" placeholder="you@company.com" />
+          @if (invalid('email')) {
+            <p class="mt-1.5 text-xs font-medium text-rose-500 animate-fade-in">Enter a valid email.</p>
+          }
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-ink" for="password">Password</label>
+          <div class="relative">
+            <input id="password" [type]="showPassword() ? 'text' : 'password'" formControlName="password"
+              autocomplete="new-password" class="field pr-11" [class.border-rose-500]="invalid('password')"
+              placeholder="At least 6 characters" />
+            <button type="button" (click)="showPassword.set(!showPassword())"
+              class="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-muted transition hover:text-ink"
+              [attr.aria-label]="showPassword() ? 'Hide password' : 'Show password'">
+              @if (showPassword()) {
+                <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" /><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" /><path d="M6.61 6.61A13.526 13.526 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" /><path d="m2 2 20 20" /></svg>
+              } @else {
+                <svg class="h-4.5 w-4.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z" /><circle cx="12" cy="12" r="3" /></svg>
+              }
+            </button>
+          </div>
+          @if (invalid('password')) {
+            <p class="mt-1.5 text-xs font-medium text-rose-500 animate-fade-in">Minimum 6 characters.</p>
+          }
+        </div>
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-ink">Role</label>
+          <div class="grid grid-cols-2 gap-2.5">
+            @for (r of roles; track r.value) {
+              <label class="cursor-pointer rounded-xl border p-3 transition-all duration-200"
+                [class]="form.controls.role.value === r.value
+                  ? 'border-brand-500 bg-brand-500/8 ring-2 ring-brand-500/20'
+                  : 'border-line bg-surface hover:bg-surface-2'">
+                <input type="radio" class="sr-only" [value]="r.value" formControlName="role" />
+                <p class="text-sm font-semibold text-ink">{{ r.label }}</p>
+                <p class="mt-0.5 text-xs text-muted">{{ r.hint }}</p>
+              </label>
+            }
+          </div>
+        </div>
+
+        <button type="submit" class="btn-brand w-full" [disabled]="submitting()">
+          @if (submitting()) {
+            <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-90" fill="currentColor" d="M4 12a8 8 0 0 1 8-8V0C5.4 0 0 5.4 0 12h4z" />
+            </svg>
+            Creating account…
+          } @else {
+            Create account
+          }
+        </button>
+      </form>
+
+      <p class="mt-6 text-center text-sm text-muted">
+        Already have an account?
+        <a routerLink="/login" class="font-semibold text-brand-600 hover:underline dark:text-brand-400">Sign in</a>
+      </p>
+    </div>
+  </div>
+</div>

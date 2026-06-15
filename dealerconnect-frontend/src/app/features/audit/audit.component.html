@@ -1,0 +1,74 @@
+<div class="mx-auto max-w-7xl space-y-5">
+  <div class="animate-fade-up">
+    <h1 class="text-2xl font-bold tracking-tight text-ink">Audit Log</h1>
+    <p class="mt-1 text-sm text-muted">A complete, time-ordered history of platform events.</p>
+  </div>
+
+  <!-- Filters -->
+  <form [formGroup]="filterForm" (ngSubmit)="load()" class="card p-4 animate-fade-up">
+    <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <select class="field" formControlName="action">
+        <option value="">All actions</option>
+        @for (a of actions; track a) { <option [value]="a">{{ label(a) }}</option> }
+      </select>
+      <select class="field" formControlName="entityType">
+        <option value="">All entities</option>
+        <option value="DEALER">Dealer</option>
+        <option value="CONTACT">Contact</option>
+        <option value="FAVORITE">Favorite</option>
+      </select>
+      <input class="field" formControlName="performedBy" placeholder="Performed by (email)" />
+      <div class="flex gap-2">
+        <button type="submit" class="btn-brand flex-1">Apply</button>
+        <button type="button" class="btn-ghost" (click)="reset()">Reset</button>
+      </div>
+    </div>
+  </form>
+
+  <!-- Table -->
+  <div class="card overflow-hidden animate-fade-up">
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-line text-left text-xs uppercase tracking-wider text-muted">
+            <th class="px-5 py-3 font-semibold">When</th>
+            <th class="px-5 py-3 font-semibold">Action</th>
+            <th class="px-5 py-3 font-semibold">Entity</th>
+            <th class="px-5 py-3 font-semibold">By</th>
+            <th class="px-5 py-3 font-semibold">Details</th>
+          </tr>
+        </thead>
+        <tbody>
+          @if (loading()) {
+            @for (row of [1,2,3,4,5,6]; track row) {
+              <tr class="border-b border-line/60">
+                <td class="px-5 py-4"><div class="skeleton h-4 w-32"></div></td>
+                <td class="px-5 py-4"><div class="skeleton h-5 w-24 rounded-full"></div></td>
+                <td class="px-5 py-4"><div class="skeleton h-4 w-16"></div></td>
+                <td class="px-5 py-4"><div class="skeleton h-4 w-28"></div></td>
+                <td class="px-5 py-4"><div class="skeleton h-4 w-48"></div></td>
+              </tr>
+            }
+          } @else if (records().length === 0) {
+            <tr>
+              <td colspan="5" class="px-5 py-16 text-center">
+                <p class="text-sm font-medium text-ink">No audit records</p>
+                <p class="mt-1 text-sm text-muted">Nothing matches the current filters.</p>
+              </td>
+            </tr>
+          } @else {
+            @for (r of records(); track r.id) {
+              <tr class="border-b border-line/60 transition hover:bg-surface-2">
+                <td class="whitespace-nowrap px-5 py-3.5 text-muted">{{ when(r.timestamp) }}</td>
+                <td class="px-5 py-3.5"><span [class]="tone(r.action)">{{ label(r.action) }}</span></td>
+                <td class="px-5 py-3.5 text-muted">{{ r.entityType }} #{{ r.entityId }}</td>
+                <td class="whitespace-nowrap px-5 py-3.5 text-ink">{{ r.performedBy || '—' }}</td>
+                <td class="px-5 py-3.5 text-muted">{{ r.details }}</td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

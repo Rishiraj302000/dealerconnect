@@ -1,0 +1,139 @@
+<div class="mx-auto max-w-5xl space-y-5">
+  <a routerLink="/dealers" class="inline-flex items-center gap-1.5 text-sm font-medium text-muted transition hover:text-ink animate-fade-up">
+    <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6" /></svg>
+    Back to Dealers
+  </a>
+
+  @if (loading()) {
+    <div class="card p-6 animate-fade-up"><div class="skeleton h-8 w-56"></div><div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-4"><div class="skeleton h-16"></div><div class="skeleton h-16"></div><div class="skeleton h-16"></div><div class="skeleton h-16"></div></div></div>
+  } @else {
+    @if (dealer(); as d) {
+    <!-- Dealer header -->
+    <div class="card p-6 animate-fade-up">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+        <div class="flex items-center gap-4">
+          <div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-accent-600 text-xl font-bold text-white">{{ d.name.charAt(0) }}</div>
+          <div>
+            <h1 class="text-2xl font-bold tracking-tight text-ink">{{ d.name }}</h1>
+            <div class="mt-1.5 flex items-center gap-2">
+              <span class="text-sm text-muted">{{ d.code }}</span>
+              <span [class]="d.status === 'ACTIVE' ? 'badge-green' : 'badge-gray'">
+                <span class="h-1.5 w-1.5 rounded-full" [class]="d.status === 'ACTIVE' ? 'bg-emerald-500' : 'bg-slate-400'"></span>
+                {{ d.status === 'ACTIVE' ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-wrap items-center gap-2">
+          <button class="btn-ghost" [class.text-amber-500]="favoriteId()" (click)="toggleFavorite()">
+            <svg class="h-4 w-4" viewBox="0 0 24 24" [attr.fill]="favoriteId() ? '#f59e0b' : 'none'" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" /></svg>
+            {{ favoriteId() ? 'Favorited' : 'Favorite' }}
+          </button>
+          @if (auth.isAdmin()) {
+            <button class="btn-ghost" [disabled]="busy()" (click)="toggleStatus()">
+              {{ d.status === 'ACTIVE' ? 'Deactivate' : 'Activate' }}
+            </button>
+            <button class="btn-danger" (click)="remove()">Delete</button>
+          }
+        </div>
+      </div>
+
+      <!-- Info grid -->
+      <div class="mt-6 grid grid-cols-2 gap-4 border-t border-line pt-6 sm:grid-cols-4">
+        <div><p class="text-xs uppercase tracking-wider text-muted">Email</p><p class="mt-1 truncate text-sm font-medium text-ink">{{ d.email || '—' }}</p></div>
+        <div><p class="text-xs uppercase tracking-wider text-muted">Phone</p><p class="mt-1 text-sm font-medium text-ink">{{ d.phone || '—' }}</p></div>
+        <div><p class="text-xs uppercase tracking-wider text-muted">City</p><p class="mt-1 text-sm font-medium text-ink">{{ d.city || '—' }}</p></div>
+        <div><p class="text-xs uppercase tracking-wider text-muted">Created</p><p class="mt-1 text-sm font-medium text-ink">{{ d.createdAt | date: 'mediumDate' }}</p></div>
+      </div>
+    </div>
+
+    <!-- Contacts -->
+    <div class="card p-6 animate-fade-up" style="animation-delay: 80ms">
+      <h2 class="font-semibold text-ink">Contacts</h2>
+      <p class="mt-1 text-sm text-muted">Tap a contact to view details, call, or email.</p>
+
+      <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+        @if (contacts().length === 0) {
+          <p class="py-6 text-sm text-muted">No contacts yet.</p>
+        } @else {
+          @for (c of contacts(); track c.id) {
+            <button type="button" (click)="selected.set(c)"
+              class="flex items-center gap-3 rounded-xl border border-line p-3 text-left transition hover:bg-surface-2 hover:shadow-soft">
+              <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-500/12 text-sm font-bold text-brand-500">{{ c.name.charAt(0) }}</div>
+              <div class="min-w-0 flex-1">
+                <p class="truncate text-sm font-semibold text-ink">{{ c.name }}</p>
+                <p class="truncate text-xs text-muted">{{ c.designation || c.email || c.phone || 'Contact' }}</p>
+              </div>
+              <svg class="h-4 w-4 shrink-0 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6" /></svg>
+            </button>
+          }
+        }
+      </div>
+
+      @if (auth.isAdmin()) {
+        <form [formGroup]="contactForm" (ngSubmit)="addContact()" class="mt-5 border-t border-line pt-5">
+          <p class="mb-3 text-sm font-medium text-ink">Add a contact</p>
+          <div class="grid grid-cols-1 gap-2.5 sm:grid-cols-2">
+            <input class="field" formControlName="name" placeholder="Name *" [class.border-rose-500]="cInvalid()" />
+            <input class="field" formControlName="designation" placeholder="Designation" />
+            <input class="field" formControlName="email" placeholder="Email" />
+            <input class="field" formControlName="phone" placeholder="Phone" />
+          </div>
+          <div class="mt-3 flex justify-end">
+            <button type="submit" class="btn-brand" [disabled]="savingContact()">
+              <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14" /></svg>
+              {{ savingContact() ? 'Adding…' : 'Add contact' }}
+            </button>
+          </div>
+        </form>
+      }
+    </div>
+    }
+  }
+</div>
+
+<!-- Contact detail modal -->
+@if (selected(); as c) {
+  <div class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-slate-900/50 backdrop-blur-sm animate-fade-in" (click)="selected.set(null)"></div>
+    <div class="relative w-full max-w-sm card p-6 animate-scale-in">
+      <button class="icon-btn absolute right-4 top-4 h-9 w-9" (click)="selected.set(null)" aria-label="Close">
+        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 6 6 18M6 6l12 12" /></svg>
+      </button>
+      <div class="flex flex-col items-center text-center">
+        <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-brand-500 to-accent-600 text-2xl font-bold text-white">{{ c.name.charAt(0) }}</div>
+        <h3 class="mt-4 text-lg font-bold text-ink">{{ c.name }}</h3>
+        @if (c.designation) { <p class="text-sm text-muted">{{ c.designation }}</p> }
+      </div>
+
+      <div class="mt-5 space-y-2.5">
+        <div class="flex items-center gap-3 rounded-xl border border-line p-3">
+          <svg class="h-4.5 w-4.5 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+          <span class="flex-1 text-sm text-ink">{{ c.phone || 'No phone on file' }}</span>
+        </div>
+        <div class="flex items-center gap-3 rounded-xl border border-line p-3">
+          <svg class="h-4.5 w-4.5 text-muted" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-10 5L2 7" /></svg>
+          <span class="flex-1 truncate text-sm text-ink">{{ c.email || 'No email on file' }}</span>
+        </div>
+      </div>
+
+      <div class="mt-5 grid grid-cols-2 gap-2.5">
+        <a [href]="c.phone ? 'tel:' + c.phone : null" class="btn-soft" [class.pointer-events-none]="!c.phone" [class.opacity-50]="!c.phone">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z" /></svg>
+          Call
+        </a>
+        <a [href]="c.email ? 'mailto:' + c.email : null" class="btn-brand" [class.pointer-events-none]="!c.email" [class.opacity-50]="!c.email">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2" /><path d="m22 7-10 5L2 7" /></svg>
+          Email
+        </a>
+      </div>
+
+      @if (auth.isAdmin()) {
+        <button class="mt-3 w-full text-center text-sm font-medium text-rose-500 hover:underline" (click)="removeContact(c)">
+          Delete contact
+        </button>
+      }
+    </div>
+  </div>
+}

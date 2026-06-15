@@ -1,0 +1,137 @@
+<div class="flex min-h-screen bg-bg">
+  <!-- Mobile overlay -->
+  @if (mobileOpen()) {
+    <div class="fixed inset-0 z-30 bg-slate-900/50 backdrop-blur-sm lg:hidden animate-fade-in"
+      (click)="mobileOpen.set(false)"></div>
+  }
+
+  <!-- Sidebar -->
+  <aside
+    class="fixed inset-y-0 left-0 z-40 flex w-64 flex-col border-r border-line bg-surface
+      transition-transform duration-300 lg:sticky lg:top-0 lg:h-screen lg:translate-x-0"
+    [class.-translate-x-full]="!mobileOpen()">
+    <div class="flex h-16 items-center gap-2.5 border-b border-line px-5">
+      <div class="flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-brand-500 to-accent-600 text-white shadow-lift">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 7l9-4 9 4-9 4-9-4z" /><path d="M3 7v10l9 4 9-4V7" /><path d="M12 11v10" />
+        </svg>
+      </div>
+      <span class="text-base font-bold tracking-tight text-ink">DealerConnect</span>
+    </div>
+
+    <nav class="flex-1 space-y-1 overflow-y-auto p-3">
+      <p class="px-3.5 pb-2 pt-3 text-[11px] font-semibold uppercase tracking-wider text-muted">Main</p>
+      @for (item of nav(); track item.path) {
+        <a [routerLink]="item.path" routerLinkActive="active" class="nav-link"
+          (click)="mobileOpen.set(false)">
+          <span class="shrink-0">
+            @switch (item.icon) {
+              @case ('grid') {
+                <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="3" width="7" height="7" rx="1.5" /><rect x="14" y="14" width="7" height="7" rx="1.5" /><rect x="3" y="14" width="7" height="7" rx="1.5" />
+                </svg>
+              }
+              @case ('store') {
+                <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 9l1-5h16l1 5" /><path d="M4 9v11h16V9" /><path d="M3 9h18" /><path d="M9 20v-6h6v6" />
+                </svg>
+              }
+              @case ('star') {
+                <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                </svg>
+              }
+              @case ('history') {
+                <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M3 3v5h5" /><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8" /><path d="M12 7v5l4 2" />
+                </svg>
+              }
+            }
+          </span>
+          {{ item.label }}
+        </a>
+      }
+    </nav>
+
+    <div class="border-t border-line p-3">
+      <div class="flex items-center gap-3 rounded-xl px-2 py-2">
+        <div class="flex h-9 w-9 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-accent-600 text-sm font-bold text-white">{{ initial() }}</div>
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-semibold text-ink">{{ auth.user()?.email }}</p>
+          <p class="truncate text-xs text-muted">{{ roleLabel() }}</p>
+        </div>
+        <button (click)="logout()" class="icon-btn h-9 w-9" aria-label="Log out">
+          <svg class="h-[18px] w-[18px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" /><path d="m16 17 5-5-5-5" /><path d="M21 12H9" />
+          </svg>
+        </button>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main column -->
+  <div class="flex min-w-0 flex-1 flex-col">
+    <header class="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-line surface-blur px-4 sm:px-6">
+      <button (click)="mobileOpen.set(true)" class="icon-btn lg:hidden" aria-label="Open menu">
+        <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 12h18M3 6h18M3 18h18" />
+        </svg>
+      </button>
+
+      <div class="relative hidden max-w-xs flex-1 sm:block">
+        <span class="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted">
+          <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
+          </svg>
+        </span>
+        <input type="text" placeholder="Search…" class="field py-2 pl-9 text-sm" />
+      </div>
+
+      <div class="ml-auto flex items-center gap-2">
+        <div class="relative">
+          <button class="icon-btn relative" aria-label="Notifications" (click)="toggleNotif()">
+            <svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9" /><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+            </svg>
+            @if (notices().length > 0) {
+              <span class="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-rose-500 ring-2 ring-surface"></span>
+            }
+          </button>
+
+          @if (notifOpen()) {
+            <div class="fixed inset-0 z-30" (click)="notifOpen.set(false)"></div>
+            <div class="absolute right-0 z-40 mt-2 w-80 max-w-[calc(100vw-2rem)] card overflow-hidden p-0 animate-scale-in origin-top-right">
+              <div class="flex items-center justify-between border-b border-line px-4 py-3">
+                <p class="text-sm font-semibold text-ink">Notifications</p>
+                <span class="badge-gray">{{ notices().length }}</span>
+              </div>
+              <div class="max-h-80 overflow-y-auto">
+                @if (notices().length === 0) {
+                  <p class="px-4 py-8 text-center text-sm text-muted">You're all caught up.</p>
+                } @else {
+                  @for (n of notices(); track $index) {
+                    <div class="flex items-start gap-3 border-b border-line/60 px-4 py-3 last:border-0">
+                      <span class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-brand-500/12 text-brand-500">
+                        <svg class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9" /><path d="M12 8v4l3 2" /></svg>
+                      </span>
+                      <div class="min-w-0 flex-1">
+                        <p class="text-sm text-ink">{{ n.text }}</p>
+                        <p class="mt-0.5 text-xs text-muted">{{ n.time }}</p>
+                      </div>
+                    </div>
+                  }
+                }
+              </div>
+            </div>
+          }
+        </div>
+        <app-theme-toggle></app-theme-toggle>
+        <div class="ml-1 flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-brand-500 to-accent-600 text-sm font-bold text-white">{{ initial() }}</div>
+      </div>
+    </header>
+
+    <main class="flex-1 px-4 py-6 sm:px-6 lg:px-8">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

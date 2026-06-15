@@ -1,0 +1,154 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ---------------------------------------------------------------------------
+   Theme tokens. Channels are space-separated RGB so Tailwind can apply alpha.
+--------------------------------------------------------------------------- */
+:root {
+  --bg: 247 248 251;
+  --surface: 255 255 255;
+  --surface-2: 248 249 252;
+  --line: 228 231 238;
+  --ink: 17 24 39;
+  --muted: 107 114 128;
+}
+
+.dark {
+  --bg: 8 9 15;
+  --surface: 17 18 27;
+  --surface-2: 24 25 37;
+  --line: 38 40 54;
+  --ink: 236 239 247;
+  --muted: 148 155 176;
+}
+
+* {
+  border-color: rgb(var(--line));
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: rgb(var(--bg));
+  color: rgb(var(--ink));
+}
+
+/* Smooth the light/dark swap without animating every paint on first load */
+.theme-anim,
+.theme-anim *,
+.theme-anim *::before,
+.theme-anim *::after {
+  transition: background-color 0.45s ease, border-color 0.45s ease, color 0.3s ease,
+    fill 0.3s ease, box-shadow 0.45s ease;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgb(var(--line));
+  border-radius: 999px;
+  border: 3px solid rgb(var(--bg));
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgb(var(--muted) / 0.6);
+}
+
+@layer components {
+  .card {
+    @apply rounded-2xl border border-line bg-surface shadow-soft;
+  }
+
+  .surface-blur {
+    background: rgb(var(--surface) / 0.72);
+    backdrop-filter: blur(16px) saturate(140%);
+  }
+
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm
+      font-semibold transition-all duration-200 active:scale-[0.97]
+      disabled:pointer-events-none disabled:opacity-50;
+  }
+  .btn-brand {
+    @apply btn text-white shadow-lift;
+    background-image: linear-gradient(135deg, #6366f1, #7c3aed);
+  }
+  .btn-brand:hover {
+    filter: brightness(1.07);
+    transform: translateY(-1px);
+  }
+  .btn-ghost {
+    @apply btn border border-line bg-surface text-ink hover:bg-surface-2;
+  }
+  .btn-soft {
+    @apply btn bg-brand-500/10 text-brand-600 hover:bg-brand-500/20 dark:text-brand-300;
+  }
+  .btn-danger {
+    @apply btn bg-rose-500/10 text-rose-600 hover:bg-rose-500/20 dark:text-rose-400;
+  }
+  .icon-btn {
+    @apply inline-flex h-10 w-10 items-center justify-center rounded-xl border border-line
+      bg-surface text-muted transition-all duration-200 hover:text-ink hover:bg-surface-2
+      active:scale-90;
+  }
+
+  .field {
+    @apply w-full rounded-xl border border-line bg-surface px-3.5 py-2.5 text-sm text-ink
+      outline-none transition-all duration-200 placeholder:text-muted/70
+      focus:border-brand-500 focus:ring-4 focus:ring-brand-500/15;
+  }
+
+  .badge {
+    @apply inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-semibold;
+  }
+  .badge-green {
+    @apply badge bg-emerald-500/12 text-emerald-600 dark:text-emerald-400;
+  }
+  .badge-gray {
+    @apply badge bg-slate-500/12 text-slate-500 dark:text-slate-400;
+  }
+
+  .nav-link {
+    @apply relative flex items-center gap-3 rounded-xl px-3.5 py-2.5 text-sm font-medium
+      text-muted transition-all duration-200 hover:bg-surface-2 hover:text-ink;
+  }
+  .nav-link.active {
+    @apply bg-brand-500/12 text-brand-600 dark:text-brand-300;
+  }
+  .nav-link.active::before {
+    content: '';
+    @apply absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-brand-500;
+  }
+
+  .skeleton {
+    @apply relative overflow-hidden rounded-lg bg-surface-2;
+  }
+  .skeleton::after {
+    content: '';
+    @apply absolute inset-0 -translate-x-full;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgb(var(--ink) / 0.06),
+      transparent
+    );
+    animation: shimmer 1.4s infinite;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    background: linear-gradient(120deg, #6366f1, #8b5cf6, #ec4899);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+}
