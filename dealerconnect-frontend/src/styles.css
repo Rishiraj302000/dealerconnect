@@ -39,6 +39,12 @@ body {
   color: rgb(var(--ink));
 }
 
+/* Hide the browser's native password reveal/clear icons (we provide our own). */
+input::-ms-reveal,
+input::-ms-clear {
+  display: none;
+}
+
 /* Smooth the light/dark swap without animating every paint on first load */
 .theme-anim,
 .theme-anim *,

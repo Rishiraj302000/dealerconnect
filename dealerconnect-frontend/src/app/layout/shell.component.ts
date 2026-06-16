@@ -86,7 +86,11 @@ export class ShellComponent implements OnInit {
   }
 
   protected toggleNotif(): void {
-    this.notifOpen.update((v) => !v);
+    const opening = !this.notifOpen();
+    this.notifOpen.set(opening);
+    if (opening) {
+      this.loadNotices();
+    }
   }
 
   protected logout(): void {

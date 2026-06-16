@@ -13,3 +13,17 @@
 
 # Maven
 target/
+
+# Documentation build folder (diagrams, markdown docs, generator scripts)
+docs/
+
+# Personal viva/presentation notes - not for the public repo
+DealerConnect_Presentation_Guide.docx
+
+# Proprietary assignment brief
+*.pdf
+
+# Node / Angular build artifacts
+node_modules/
+dist/
+.angular/
