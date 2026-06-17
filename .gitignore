@@ -20,6 +20,9 @@ docs/
 # Personal viva/presentation notes - not for the public repo
 DealerConnect_Presentation_Guide.docx
 
+# Microsoft Office temporary lock files
+~$*
+
 # Proprietary assignment brief
 *.pdf
 
