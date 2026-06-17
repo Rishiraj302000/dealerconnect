@@ -17,8 +17,10 @@ target/
 # Documentation build folder (diagrams, markdown docs, generator scripts)
 docs/
 
-# Personal viva/presentation notes - not for the public repo
+# Personal viva/presentation aids - not for the public repo
 DealerConnect_Presentation_Guide.docx
+DealerConnect_Viva_Answers.docx
+DealerConnect_Presentation.pptx
 
 # Microsoft Office temporary lock files
 ~$*
